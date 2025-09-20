@@ -81,19 +81,37 @@ func GetEventByID(id int64) (*Event,error){ // null value for pointer is nil
 // query to get
 
 func (event Event) Update() error {
-	query := `
-	UPDATE events
-	SET name = ?, descirption = ?, location = ?, dateTime = ?
-	WHERE id =?
-	`
-	stmt,err :=db.DB.Prepare(query)
+    query := `
+    UPDATE events
+    SET name = ?, description = ?, location = ?, dateTime = ?
+    WHERE id =?
+    `
+    stmt,err :=db.DB.Prepare(query)
+    if err!=nil{
+        return err
+    }
+
+    defer stmt.Close()
+
+    _,err = stmt.Exec(event.Name,event.Description,event.Location,event.DateTime,event.ID)
+    return err
+}
+
+
+
+// Delete event by id
+func (event Event)Delete() error{
+
+	query:="DELETE FROM events WHERE id = ?"
+	stmt,err:=db.DB.Prepare(query)
 	if err!=nil{
 		return err
 	}
-
 	defer stmt.Close()
-
-	_,err = stmt.Exec(event.Name,event.Description,event.Location,event.DateTime,event.ID)
+	_,err=stmt.Exec(event.ID)
 	return err
+
 }
+
+
 
